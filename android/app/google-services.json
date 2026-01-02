@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1026134323276",
+    "project_id": "tien-dien-28d7a",
+    "storage_bucket": "tien-dien-28d7a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1026134323276:android:ba2fdc51b38057b57f04e9",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuHI-C9lhY0dTfCnILBIHshzvURswUohI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

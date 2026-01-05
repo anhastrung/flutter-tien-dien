@@ -1,9 +1,9 @@
-// pages/room_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/app_provider.dart';
 import '../models/room.dart';
+import '../widgets/app_drawer.dart';
 
 class RoomPage extends StatefulWidget {
   const RoomPage({super.key});
@@ -43,13 +43,12 @@ class _RoomPageState extends State<RoomPage> {
                           final name = controller.text.trim();
                           if (name.isEmpty) return;
 
+                          Navigator.pop(context);
+
                           if (room == null) {
-                            // ❗ ĐÓNG MODAL TRƯỚC
-                            Navigator.pop(context);
                             await provider.addRoom(name);
                           } else {
                             room.name = name;
-                            Navigator.pop(context);
                             await provider.updateRoom(room);
                           }
                         },
@@ -74,7 +73,16 @@ class _RoomPageState extends State<RoomPage> {
     final p = context.watch<AppProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Quản lý phòng')),
+      appBar: AppBar(
+        title: const Text('Quản lý phòng'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+      ),
+      drawer: const AppDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: p.isCreatingRoom ? null : () => _showDialog(p),
         child: const Icon(Icons.add),
@@ -83,6 +91,7 @@ class _RoomPageState extends State<RoomPage> {
         itemCount: p.rooms.length,
         itemBuilder: (_, i) {
           final r = p.rooms[i];
+
           return Card(
             child: ListTile(
               title: Text(r.name),

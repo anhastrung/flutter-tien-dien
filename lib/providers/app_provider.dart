@@ -26,17 +26,12 @@ class AppProvider extends ChangeNotifier {
   double _totalCounter = 0;
   double get totalCounter => _totalCounter;
 
+  void setTotalCounter(double value) {
+    _totalCounter = value;
+    notifyListeners();
+  }
+
   double vat = 0.08;
-
-  LossOption lossOption = LossOption.splitAll;
-  LossDivineOption lossDivineOption = LossDivineOption.splitAll;
-
-  bool isLoadingRooms = false;
-  bool isCreatingRoom = false;
-  bool isUpdatingRoom = false;
-  bool isDeletingRoom = false;
-
-  final List<Room> rooms = [];
 
   final List<ElectricTier> tiers = [
     ElectricTier(from: 0, to: 50, price: 1984),
@@ -47,18 +42,54 @@ class AppProvider extends ChangeNotifier {
     ElectricTier(from: 401, to: double.infinity, price: 3460),
   ];
 
+  void updateVat(double value) {
+    vat = value.clamp(0, 1);
+    notifyListeners();
+  }
+
+  void updateTier(int index, double price) {
+    if (index < 0 || index >= tiers.length) return;
+
+    tiers[index] = ElectricTier(
+      from: tiers[index].from,
+      to: tiers[index].to,
+      price: price,
+    );
+    notifyListeners();
+  }
+
+  LossOption lossOption = LossOption.splitAll;
+  LossDivineOption lossDivineOption = LossDivineOption.splitAll;
+
+  void setLossOption(LossOption option) {
+    lossOption = option;
+    notifyListeners();
+  }
+
+  void setLossDivineOption(LossDivineOption option) {
+    lossDivineOption = option;
+    notifyListeners();
+  }
+
+  final List<Room> rooms = [];
+
+  bool isLoadingRooms = false;
+  bool isCreatingRoom = false;
+  bool isUpdatingRoom = false;
+  bool isDeletingRoom = false;
+
   double get sumRoomCounter => rooms.fold(0, (sum, r) => sum + r.tempCounter);
 
   bool get isCounterValid => sumRoomCounter <= totalCounter;
 
-  void setTotalCounter(double value) {
-    _totalCounter = value;
+  Future<void> resetAndLoadRooms() async {
+    rooms.clear();
     notifyListeners();
+    await loadRooms();
   }
 
   Future<void> loadRooms() async {
     if (isLoadingRooms) return;
-
     isLoadingRooms = true;
     notifyListeners();
 
@@ -75,70 +106,39 @@ class AppProvider extends ChangeNotifier {
 
   Future<void> addRoom(String name) async {
     if (isCreatingRoom) return;
-
     isCreatingRoom = true;
-
-    final tempRoom = Room(
-      id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
-      name: name,
-      isOwnerRoom: false,
-    );
-
-    rooms.add(tempRoom);
     notifyListeners();
 
-    try {
-      final realRoom = await RoomFirestore.addRoom(name);
-      final index = rooms.indexWhere((r) => r.id == tempRoom.id);
-      if (index != -1) {
-        rooms[index] = realRoom;
-      }
-    } catch (e) {
-      rooms.removeWhere((r) => r.id == tempRoom.id);
-      rethrow;
-    } finally {
-      isCreatingRoom = false;
-      notifyListeners();
+    final room = await RoomFirestore.addRoom(name);
+    if (room != null) {
+      rooms.add(room);
     }
+
+    isCreatingRoom = false;
+    notifyListeners();
   }
 
   Future<void> updateRoom(Room room) async {
     if (isUpdatingRoom) return;
-
     isUpdatingRoom = true;
     notifyListeners();
 
-    try {
-      await RoomFirestore.updateRoom(room);
-    } finally {
-      isUpdatingRoom = false;
-      notifyListeners();
-    }
+    await RoomFirestore.updateRoom(room);
+
+    isUpdatingRoom = false;
+    notifyListeners();
   }
 
   Future<void> deleteRoom(String id) async {
     if (isDeletingRoom) return;
-
     isDeletingRoom = true;
-
-    final index = rooms.indexWhere((r) => r.id == id);
-    if (index == -1) {
-      isDeletingRoom = false;
-      return;
-    }
-
-    final removed = rooms.removeAt(index);
     notifyListeners();
 
-    try {
-      await RoomFirestore.deleteRoom(id);
-    } catch (e) {
-      rooms.insert(index, removed);
-      rethrow;
-    } finally {
-      isDeletingRoom = false;
-      notifyListeners();
-    }
+    rooms.removeWhere((r) => r.id == id);
+    await RoomFirestore.deleteRoom(id);
+
+    isDeletingRoom = false;
+    notifyListeners();
   }
 
   void updateTempCounter(Room room, double value) {
@@ -146,37 +146,9 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setLossOption(LossOption option) {
-    lossOption = option;
-    notifyListeners();
-  }
-
-  void setLossDivineOption(LossDivineOption option) {
-    lossDivineOption = option;
-    notifyListeners();
-  }
-
-  void updateVat(double value) {
-    vat = value;
-    notifyListeners();
-  }
-
-  void updateTier(int index, double price) {
-    tiers[index] = ElectricTier(
-      from: tiers[index].from,
-      to: tiers[index].to,
-      price: price,
-    );
-    notifyListeners();
-  }
-
   List<RoomResult> calculate() {
-    final roomSumElectric = rooms.fold(0.0, (sum, r) => sum + r.tempCounter);
-
-    final lossElectric = (totalCounter - roomSumElectric).clamp(
-      0,
-      double.infinity,
-    );
+    final roomSum = sumRoomCounter;
+    final lossElectric = (totalCounter - roomSum).clamp(0, double.infinity);
 
     List<Room> lossRooms;
     switch (lossOption) {
@@ -198,13 +170,11 @@ class AppProvider extends ChangeNotifier {
       double lossKwh = 0;
 
       if (lossElectric > 0 && activeRooms.contains(room)) {
-        if (lossDivineOption == LossDivineOption.splitAll) {
-          lossKwh = lossElectric / activeRooms.length;
-        } else {
-          lossKwh = activeSum == 0
-              ? 0
-              : lossElectric * room.tempCounter / activeSum;
-        }
+        lossKwh = lossDivineOption == LossDivineOption.splitAll
+            ? lossElectric / activeRooms.length
+            : activeSum == 0
+            ? 0
+            : lossElectric * room.tempCounter / activeSum;
       }
 
       final totalKwh = room.tempCounter + lossKwh;

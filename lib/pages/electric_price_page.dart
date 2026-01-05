@@ -1,9 +1,11 @@
+// pages/electric_price_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import '../providers/app_provider.dart';
+import '../widgets/app_drawer.dart';
 
 class ElectricPricePage extends StatelessWidget {
   const ElectricPricePage({super.key});
@@ -22,7 +24,16 @@ class ElectricPricePage extends StatelessWidget {
     final p = context.watch<AppProvider>();
     Timer? debounce;
     return Scaffold(
-      appBar: AppBar(title: const Text('Giá điện & VAT')),
+      appBar: AppBar(
+        title: const Text('Giá điện & VAT'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+      ),
+      drawer: const AppDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
+import '../widgets/app_drawer.dart';
 import '../providers/app_provider.dart';
-import 'room_page.dart';
-import 'electric_price_page.dart';
 import 'result_page.dart';
 
 class InfoText extends StatelessWidget {
@@ -153,16 +151,6 @@ class _InputPageState extends State<InputPage> {
   void initState() {
     super.initState();
     totalCounterCtrl = TextEditingController();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final p = context.read<AppProvider>();
-      p.loadRooms();
-
-      if (p.totalCounter > 0) {
-        totalCounterCtrl.text = p.totalCounter.toInt().toString();
-      }
-    });
   }
 
   @override
@@ -204,23 +192,14 @@ class _InputPageState extends State<InputPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tính tiền điện'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const RoomPage()),
-            ),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
-          IconButton(
-            icon: const Icon(Icons.flash_on),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ElectricPricePage()),
-            ),
-          ),
-        ],
+        ),
       ),
+      drawer: const AppDrawer(),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -308,17 +287,18 @@ class _InputPageState extends State<InputPage> {
                       ),
                     );
                   }),
-                  if (!p.isCounterValid)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8),
-                      child: Text(
-                        'Giá trị counter tổng phải lớn hơn counter các phòng!',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
                 ],
               ),
             ),
+
+            if (!p.isCounterValid)
+              Padding(
+                padding: const EdgeInsets.only(top: 8, left: 4),
+                child: Text(
+                  'Giá trị counter tổng phải lớn hơn counter các phòng!',
+                  style: TextStyle(color: Colors.red, fontSize: 13),
+                ),
+              ),
 
             const Divider(height: 32),
 

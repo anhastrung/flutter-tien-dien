@@ -1,3 +1,4 @@
+// models/room.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Room {

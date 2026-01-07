@@ -1,3 +1,4 @@
+// models/electric_tier.dart
 class ElectricTier {
   final double from;
   final double to;

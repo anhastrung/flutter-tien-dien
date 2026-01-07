@@ -34,6 +34,12 @@ class ElectricPricePage extends StatelessWidget {
         ),
       ),
       drawer: const AppDrawer(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pop(context),
+        backgroundColor: Colors.green,
+        tooltip: 'Lưu và về trang chủ',
+        child: const Icon(Icons.check, color: Colors.white),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -86,7 +92,8 @@ class ElectricPricePage extends StatelessWidget {
               children: [
                 const Text('VAT %'),
                 const SizedBox(width: 16),
-                Expanded(
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.65,
                   child: TextField(
                     keyboardType: TextInputType.number,
                     controller: TextEditingController(

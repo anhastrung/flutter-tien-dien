@@ -1,3 +1,4 @@
+// pages/home_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/app_drawer.dart';
@@ -6,6 +7,7 @@ import 'input_page.dart';
 import 'room_page.dart';
 import 'electric_price_page.dart';
 import 'login_page.dart';
+import '../pages/statistics_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -89,6 +91,16 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const ElectricPricePage()),
+                );
+              },
+            ),
+            _menuButton(
+              icon: Icons.bar_chart,
+              title: 'Thống kê điện',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const StatisticsPage()),
                 );
               },
             ),

@@ -1,3 +1,4 @@
+// widgets/app_drawer.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -6,6 +7,7 @@ import '../pages/input_page.dart';
 import '../pages/room_page.dart';
 import '../pages/electric_price_page.dart';
 import '../pages/login_page.dart';
+import '../pages/statistics_page.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -26,7 +28,6 @@ class AppDrawer extends StatelessWidget {
       backgroundColor: Colors.white,
       child: Column(
         children: [
-          // Dart
           DrawerHeader(
             decoration: const BoxDecoration(color: headerBg),
             margin: EdgeInsets.zero,
@@ -75,6 +76,12 @@ class AppDrawer extends StatelessWidget {
                     icon: Icons.flash_on,
                     title: 'Giá điện',
                     onTap: () => _go(context, const ElectricPricePage()),
+                  ),
+                  _menuItem(
+                    context,
+                    icon: Icons.bar_chart,
+                    title: 'Thống kê',
+                    onTap: () => _go(context, const StatisticsPage()),
                   ),
                   const Divider(height: 32, color: Color(0xFFE0E0E0)),
                   _menuItem(

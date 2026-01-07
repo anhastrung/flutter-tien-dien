@@ -1,3 +1,4 @@
+// pages/electric_price_page.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class RoomResultDetailPage extends StatelessWidget {
     final totalMoney = subTotal + vatMoney;
 
     return Scaffold(
-      appBar: AppBar(title: Text(result.room.name)),
+      appBar: AppBar(title: Text(result.room.name),),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

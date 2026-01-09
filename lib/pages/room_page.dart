@@ -83,25 +83,18 @@ class _RoomPageState extends State<RoomPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () async {
-              await p.loadRooms();
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.popUntil(context, (route) => route.isFirst);
             },
-            tooltip: 'Tải lại dữ liệu phòng',
-          ),
-          IconButton(
-            onPressed: p.isCreatingRoom ? null : () => _showDialog(p),
-            icon: const Icon(Icons.add),
-            tooltip: 'Thêm phòng',
+            tooltip: 'Về trang chủ',
           ),
         ],
       ),
       drawer: const AppDrawer(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        backgroundColor: Colors.blue,
-        tooltip: 'Về trang chủ',
-        child: const Icon(Icons.home),
+        onPressed: p.isCreatingRoom ? null : () => _showDialog(p),
+        child: const Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: p.rooms.length,

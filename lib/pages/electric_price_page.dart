@@ -1,11 +1,9 @@
-// pages/electric_price_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import '../providers/app_provider.dart';
-import '../widgets/app_drawer.dart';
 
 class ElectricPricePage extends StatelessWidget {
   const ElectricPricePage({super.key});
@@ -26,19 +24,15 @@ class ElectricPricePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Giá điện & VAT'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.popUntil(context, (route) => route.isFirst);
+            },
+            tooltip: 'Về trang chủ',
           ),
-        ),
-      ),
-      drawer: const AppDrawer(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        backgroundColor: Colors.green,
-        tooltip: 'Lưu và về trang chủ',
-        child: const Icon(Icons.check, color: Colors.white),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -92,8 +86,7 @@ class ElectricPricePage extends StatelessWidget {
               children: [
                 const Text('VAT %'),
                 const SizedBox(width: 16),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.65,
+                Expanded(
                   child: TextField(
                     keyboardType: TextInputType.number,
                     controller: TextEditingController(

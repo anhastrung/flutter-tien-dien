@@ -7,21 +7,25 @@ import '../services/room_firestore.dart';
 import '../services/electric_calc_service.dart';
 
 enum LossOption {
-  splitAll('Chia đều'),
-  ownerPay('Chủ trọ'),
-  tenantPay('Người thuê');
+  splitByPercent('Chia theo % điện đã dùng', 'split_by_percent'),
+  splitAll('Chia đều', 'split_all'),
+  ownerPay('Chủ trọ', 'owner_pay'),
+  tenantPay('Người thuê', 'tenant_pay');
 
   final String name;
-  const LossOption(this.name);
+  final String title;
+  const LossOption(this.name, this.title);
+
+  Map<String, dynamic> toMap() => {'name': name, 'title': title};
 }
 
-enum LossDivineOption {
-  splitAll('Chia đều'),
-  splitByPercent('Chia theo % điện đã dùng');
+// enum LossDivineOption {
+//   splitAll('Chia đều'),
+//   splitByPercent('Chia theo % điện đã dùng');
 
-  final String name;
-  const LossDivineOption(this.name);
-}
+//   final String name;
+//   const LossDivineOption(this.name);
+// }
 
 class AppProvider extends ChangeNotifier {
   double _totalCounter = 0;
@@ -59,18 +63,18 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  LossOption lossOption = LossOption.splitAll;
-  LossDivineOption lossDivineOption = LossDivineOption.splitAll;
+  LossOption lossOption = LossOption.splitByPercent;
+  // LossDivineOption lossDivineOption = LossDivineOption.splitAll;
 
   void setLossOption(LossOption option) {
     lossOption = option;
     notifyListeners();
   }
 
-  void setLossDivineOption(LossDivineOption option) {
-    lossDivineOption = option;
-    notifyListeners();
-  }
+  // void setLossDivineOption(LossDivineOption option) {
+  //   lossDivineOption = option;
+  //   notifyListeners();
+  // }
 
   final List<Room> rooms = [];
 
@@ -82,6 +86,7 @@ class AppProvider extends ChangeNotifier {
   double get sumRoomCounter => rooms.fold(0, (sum, r) => sum + r.tempCounter);
 
   bool get isCounterValid => sumRoomCounter <= totalCounter;
+  bool get isTotalCounterValid => totalCounter > 0;
 
   Future<void> resetAndLoadRooms() async {
     rooms.clear();
@@ -147,11 +152,25 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<RoomResult> calculate() {
-    final roomSum = sumRoomCounter;
-    final lossElectric = (totalCounter - roomSum).clamp(0, double.infinity);
+  void resetForm() {
+    _totalCounter = 0;
+    vat = 0.08;
+    lossOption = LossOption.splitByPercent;
+    // lossDivineOption = LossDivineOption.splitAll;
+    for (final room in rooms) {
+      room.tempCounter = 0;
+    }
+    notifyListeners();
+  }
 
-    List<Room> lossRooms;
+  List<RoomResult> calculate() {
+    final roomSum = sumRoomCounter; // tổng điện
+    final lossElectric = (totalCounter - roomSum).clamp(
+      0,
+      double.infinity,
+    ); // tổng điện thất thoát
+
+    List<Room> lossRooms; // những phòng được tính tiền
     switch (lossOption) {
       case LossOption.ownerPay:
         lossRooms = rooms.where((r) => r.isOwnerRoom).toList();
@@ -159,19 +178,23 @@ class AppProvider extends ChangeNotifier {
       case LossOption.tenantPay:
         lossRooms = rooms.where((r) => !r.isOwnerRoom).toList();
         break;
+      case LossOption.splitByPercent:
       case LossOption.splitAll:
         lossRooms = rooms;
         break;
     }
 
-    final activeRooms = lossRooms.where((r) => r.tempCounter > 0).toList();
+    final activeRooms = lossRooms
+        .where((r) => r.tempCounter > 0)
+        .toList(); // những phòng còn hoạt động
     final activeSum = activeRooms.fold(0.0, (s, r) => s + r.tempCounter);
 
     return rooms.map((room) {
       double lossKwh = 0;
 
       if (lossElectric > 0 && activeRooms.contains(room)) {
-        lossKwh = lossDivineOption == LossDivineOption.splitAll
+        // lossKwh = lossDivineOption == LossDivineOption.splitAll
+        lossKwh = lossOption == LossOption.splitAll
             ? lossElectric / activeRooms.length
             : activeSum == 0
             ? 0

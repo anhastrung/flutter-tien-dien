@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../models/electric_tier.dart';
 import '../models/room_result.dart';
+import '../models/tier.result.dart';
 import '../providers/app_provider.dart';
 
 class RoomResultDetailPage extends StatelessWidget {
@@ -24,7 +25,7 @@ class RoomResultDetailPage extends StatelessWidget {
     final totalMoney = subTotal + vatMoney;
 
     return Scaffold(
-      appBar: AppBar(title: Text(result.room.name),),
+      appBar: AppBar(title: Text(result.room.name)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -150,18 +151,4 @@ class RoomResultDetailPage extends StatelessWidget {
     }
     return result;
   }
-}
-
-class TierResult {
-  final int index;
-  final double price;
-  final double kwh;
-  final double money;
-
-  TierResult({
-    required this.index,
-    required this.price,
-    required this.kwh,
-    required this.money,
-  });
 }

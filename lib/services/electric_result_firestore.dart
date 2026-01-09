@@ -7,6 +7,7 @@ class ElectricResultFirestore {
   static Future<void> saveResult({
     required String month,
     required List<RoomResult> results,
+    required String lossOption,
   }) async {
     final totalMoney = results.fold<double>(0, (s, r) => s + r.money);
     await _ref.add({
@@ -14,6 +15,7 @@ class ElectricResultFirestore {
       'totalMoney': totalMoney,
       'createdAt': Timestamp.now(),
       'details': results.map((e) => e.toJson()).toList(),
+      'LossOption': lossOption,
     });
   }
 

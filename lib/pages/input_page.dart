@@ -211,7 +211,7 @@ class _InputPageState extends State<InputPage> {
                 ),
               ),
               child: const Text(
-                'Tính tiền điện',
+                'Tính',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             ),

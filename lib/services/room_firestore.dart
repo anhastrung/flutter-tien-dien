@@ -19,7 +19,6 @@ class RoomFirestore {
         );
       }).toList();
     } on FirebaseException catch (e) {
-      // QUAN TRỌNG: KHÔNG throw
       print('getRooms Firebase error: ${e.code}');
       return [];
     } catch (e) {

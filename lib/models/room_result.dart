@@ -1,3 +1,4 @@
+// models/room_result.dart
 import 'room.dart';
 
 class RoomResult {

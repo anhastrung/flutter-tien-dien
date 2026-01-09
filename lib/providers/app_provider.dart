@@ -7,10 +7,10 @@ import '../services/room_firestore.dart';
 import '../services/electric_calc_service.dart';
 
 enum LossOption {
-  splitByPercent('Chia theo % điện đã dùng', 'split_by_percent'),
-  splitAll('Chia đều', 'split_all'),
-  ownerPay('Chủ trọ', 'owner_pay'),
-  tenantPay('Người thuê', 'tenant_pay');
+  splitByPercent('Chia theo % điện đã dùng', 'splitByPercent'),
+  splitAll('Chia đều', 'splitAll'),
+  ownerPay('Chủ trọ', 'ownerPay'),
+  tenantPay('Người thuê', 'tenantPay');
 
   final String name;
   final String title;
